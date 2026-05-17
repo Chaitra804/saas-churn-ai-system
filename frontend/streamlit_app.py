@@ -4,13 +4,15 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import random
-from datetime import datetime
 
 # ---------------------------------------------------
-# BACKEND CONFIG (CHANGE ONLY HERE)
+# BACKEND CONFIG
 # ---------------------------------------------------
 
 BACKEND_URL = "https://saas-churn-ai-system.onrender.com"
+
+def api_url(endpoint: str):
+    return f"{BACKEND_URL.rstrip('/')}/{endpoint.lstrip('/')}"
 
 # ---------------------------------------------------
 # PAGE CONFIG
@@ -130,6 +132,7 @@ with col2:
     st.subheader("Customer Issues")
 
     issues = st.text_area("Enter issues")
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------
@@ -140,7 +143,7 @@ if st.button("Analyze Customer"):
 
     try:
         response = requests.post(
-            f"{BACKEND_URL}/analyze",
+            api_url("analyze"),
             json={
                 "hours_spent": hours_spent,
                 "issues": issues
@@ -231,12 +234,9 @@ if st.session_state.analysis_done:
                 "content": prompt
             })
 
-            with st.chat_message("user"):
-                st.write(prompt)
-
             try:
                 r = requests.post(
-                    f"{BACKEND_URL}/chat",
+                    api_url("chat"),
                     json={
                         "message": prompt,
                         "hours_spent": hours_spent,
